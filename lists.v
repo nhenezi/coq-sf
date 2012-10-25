@@ -364,15 +364,7 @@ Proof.
   (* non empty list *)
   simpl. reflexivity.
 Qed.
-(*
-Proof.
-  induction l.
-   (* empty list *)
-    simpl. reflexivity.
-   (* non empty list *)
-    simpl. reflexivity.
-Qed.
-*)
+
 Theorem app_ass: forall l1 l2 l3 :natlist,
   (l1 ++ l2) ++ l3 = l1 ++ (l2 ++ l3).
 Proof.

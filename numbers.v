@@ -107,15 +107,6 @@ Proof. simpl. reflexivity. Qed.
 Example test_oddb2: (oddb (S (S (S (S 0))))) = false.
 Proof. simpl. reflexivity. Qed.
 
-(*pitati vukovica
-Function plus (n m: nat) {struct n}: nat :=
-  match n, m with
-    | 0, _ => m
-    | _, 0 => n
-    | S n', _ => S (plus n' m)
-  end.
-*)
-
 Module playground2.
 
 Fixpoint plus (n m : nat): nat :=

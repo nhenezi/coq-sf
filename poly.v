@@ -1,4 +1,4 @@
-Require Export Lists.
+Require Export lists.
 
 Inductive list (X:Type) : Type :=
   | nil : list X
