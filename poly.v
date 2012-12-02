@@ -81,7 +81,7 @@ Fixpoint repeat {X : Type} (n : X) (count : nat) : list X :=
 
 Example test_repeat1:
   repeat true 2 = cons true (cons true nil).
-Proof. simpl. reflexivity.
+Proof. simpl. reflexivity. Qed.
 
 Theorem nil_app : forall X:Type, forall l:list X,
   app [] l = l.
@@ -333,6 +333,40 @@ Proof. simpl. compute. reflexivity. Qed.
 Example fold_example3 : fold app [[1],[],[2,3],[4]] [] = [1,2,3,4].
 Proof. reflexivity. Qed.
 
+Definition constfun {X: Type} (x: X) : nat -> X :=
+  fun (k:nat) => x.
+
+Definition ftrue := constfun true.
+
+Example constfun_example1 : ftrue 0 = true.
+Proof. reflexivity. Qed.
+
+Example constfun_example2 : (constfun 5) 99 = 5.
+Proof. reflexivity. Qed.
+
+Definition override {X: Type} (f: nat -> X) (k:nat) (x:X) : nat -> X:=
+  fun (k':nat) => if beq_nat k k' then x else f k'.
+
+Definition fmostlytrue := override (override ftrue 1 false) 3 false.
+
+Example override_example1 : fmostlytrue 0 = true.
+Proof. reflexivity. Qed.
+
+Example override_example2 : fmostlytrue 1 = false.
+Proof. reflexivity. Qed.
+
+Example override_example3 : fmostlytrue 2 = true.
+Proof. reflexivity. Qed.
+
+Example override_example4 : fmostlytrue 3 = false.
+Proof. reflexivity. Qed.
+
+Theorem override_example : forall (b:bool),
+  (override (constfun b) 3 true) 2 = b.
+Proof.
+  intros.
+  reflexivity.
+Qed.
 
 Theorem silly1 : forall (n m o p : nat),
      n = m ->
@@ -341,4 +375,150 @@ Theorem silly1 : forall (n m o p : nat),
 Proof.
   intros n m o p eq1 eq2.
   rewrite <- eq1.
-  apply eq2. Qed.
+  apply eq2.
+Qed.
+
+
+Theorem silly2 : forall (n m o p : nat),
+     n = m ->
+     (forall (q r : nat), q = r -> [q,o] = [r,p]) ->
+     [n,o] = [m,p].
+Proof.
+  intros n m o p eq1 eq2.
+  apply eq2. apply eq1.
+Qed.
+
+Theorem silly2a : forall (n m : nat),
+     (n,n) = (m,m) ->
+     (forall (q r : nat), (q,q) = (r,r) -> [q] = [r]) ->
+     [n] = [m].
+Proof.
+  intros n m eq1 eq2.
+  apply eq2. apply eq1. Qed.
+
+Theorem silly_ex :
+     (forall n, evenb n = true -> oddb (S n) = true) ->
+     evenb 3 = true ->
+     oddb 4 = true.
+Proof.
+  intros.
+  apply H. apply H0.
+Qed.
+
+Theorem silly3 : forall (n : nat),
+     true = beq_nat n 5 ->
+     beq_nat (S (S n)) 7 = true.
+Proof.
+  intros n H.
+  symmetry.
+  apply H. Qed.
+
+Theorem rev_exercise1 : forall (l l' : list nat),
+     l = rev l' ->
+     l' = rev l.
+Proof.
+  intros.
+  rewrite -> H.
+  symmetry.
+  apply rev_involutive.
+Qed.
+
+Theorem unfold_example : forall m n,
+  3 + n = m ->
+  plus3 n + 1 = m + 1.
+Proof.
+  intros m n H.
+  unfold plus3.
+  rewrite H.
+  reflexivity.
+Qed.
+
+
+Theorem override_eq : forall {X:Type} x k (f:nat -> X),
+  (override f k x) k = x.
+Proof.
+  intros X x k f.
+  unfold override.
+  rewrite <- beq_nat_refl.
+  reflexivity. 
+Qed.
+
+Theorem override_neq : forall {X:Type} x1 x2 k1 k2 (f : nat -> X),
+  f k1 = x1 ->
+  beq_nat k2 k1 = false ->
+  (override f k2 x2) k1 = x1.
+Proof.
+  intros.
+  unfold override.
+  rewrite -> H0.
+  apply H.
+Qed.
+
+Theorem eq_add_S : forall (n m : nat),
+     S n = S m ->
+     n = m.
+Proof.
+  intros n m eq. inversion eq. reflexivity. Qed.
+
+Theorem silly4 : forall (n m : nat),
+     [n] = [m] ->
+     n = m.
+Proof.
+  intros n o eq. inversion eq. reflexivity. Qed.
+
+Theorem silly5 : forall (n m o : nat),
+     [n,m] = [o,o] ->
+     [n] = [m].
+Proof.
+  intros n m o eq. inversion eq. reflexivity. Qed.
+
+Example sillyex1 : forall (X : Type) (x y z : X) (l j : list X),
+     x :: y :: l = z :: j ->
+     y :: l = x :: j ->
+     x = y.
+Proof.
+  intros.
+  inversion H.
+  inversion H0.
+  symmetry.
+  apply H2.
+Qed.
+
+Theorem silly6 : forall (n : nat),
+     S n = O ->
+     2 + 2 = 5.
+Proof.
+  intros n contra. inversion contra. Qed.
+
+Theorem silly7 : forall (n m : nat),
+     false = true ->
+     [n] = [m].
+Proof.
+  intros n m contra. inversion contra. Qed.
+
+Example sillyex2 : forall (X : Type) (x y z : X) (l j : list X),
+     x :: y :: l = [] ->
+     y :: l = z :: j ->
+     x = z.
+Proof.
+  intros.
+  inversion H.
+Qed.
+
+Lemma eq_remove_S : forall n m,
+  n = m -> S n = S m.
+Proof. intros n m eq. rewrite -> eq. reflexivity. Qed.
+
+Theorem length_snoc' : forall (X : Type) (v : X)
+                              (l : list X) (n : nat),
+     length l = n ->
+     length (snoc l v) = S n.
+Proof.
+  intros X v l. induction l as [| v' l'].
+  Case "l = []". intros n eq. rewrite <- eq. reflexivity.
+  Case "l = v' :: l'". intros n eq. simpl. destruct n as [| n'].
+    SCase "n = 0". inversion eq.
+    SCase "n = S n'".
+      apply eq_remove_S. apply IHl'. inversion eq. reflexivity.
+Qed.
+
