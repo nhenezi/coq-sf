@@ -1,0 +1,1 @@
+Accompanying resource for [Coq - Sofware foundations](Accompanying resource for [Coq - Sofware foundations](), weekly presentations held in [Hacklab in Mama](http://hackerspaces.org/wiki/Hacklab_in_mama)
